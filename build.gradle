@@ -1,0 +1,96 @@
+//build.gradle
+apply plugin: 'cpp'
+
+// variables
+def allCppFiles = "**/*.cpp"
+
+// paths
+def openpalPath = "${projectDir}/cpp/libs/openpal/src"
+def opendnp3Path = "${projectDir}/cpp/libs/opendnp3/src"
+def asiopalPath = "${projectDir}/cpp/libs/asiopal/src"
+def asiodnp3Path = "${projectDir}/cpp/libs/asiodnp3/src"
+
+def asioPath = System.getenv("ASIO_HOME")
+
+def inc(path) {
+    "-I${path}"
+}
+
+binaries.all {
+    cppCompiler.args "--std=c++11"              // all libraries use C++11
+    cppCompiler.define "ASIO_STANDALONE"        // required to use ASIO w/o BOOST
+}
+
+model {
+
+    components {
+
+        openpal(NativeLibrarySpec) {
+
+            binaries.all {
+                cppCompiler.args inc(openpalPath)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir "${openpalPath}/openpal"
+                        include allCppFiles
+                    }
+                }
+            }
+
+        }
+
+        opendnp3(NativeLibrarySpec) {
+
+            binaries.all {
+                cppCompiler.args inc(openpalPath), inc(opendnp3Path)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir "${opendnp3Path}/opendnp3"
+                        include allCppFiles
+                    }
+                }
+            }
+
+        }
+
+        asiopal(NativeLibrarySpec) {
+
+            binaries.all {
+                cppCompiler.args inc(openpalPath), inc(asioPath)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir "${asiopalPath}/asiopal"
+                        include allCppFiles
+                    }
+                }
+            }
+        }
+
+        asiodnp3(NativeLibrarySpec) {
+
+            binaries.all {
+                cppCompiler.args inc(openpalPath), inc(opendnp3Path), inc(asiopalPath), inc(asiodnp3Path), inc(asioPath)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir "${asiodnp3Path}/asiodnp3"
+                        include allCppFiles
+                    }
+                }
+            }
+        }
+
+
+    }
+}

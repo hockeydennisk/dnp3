@@ -49,6 +49,10 @@ outstationdemo
 masterdemo
 outstationdemoSAv5
 
+#gradle
+build
+.gradle
+
 openpaltest.log
 openpaltest.trs
 dnp3test.log
