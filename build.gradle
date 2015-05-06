@@ -9,6 +9,7 @@ def openpalPath = "${projectDir}/cpp/libs/openpal/src"
 def opendnp3Path = "${projectDir}/cpp/libs/opendnp3/src"
 def asiopalPath = "${projectDir}/cpp/libs/asiopal/src"
 def asiodnp3Path = "${projectDir}/cpp/libs/asiodnp3/src"
+def secauthv5Path = "${projectDir}/cpp/libs/secauthv5/src"
 
 // test library paths
 def catchPath = "${projectDir}/cpp/tests/catch"
@@ -16,6 +17,7 @@ def testlibPath = "${projectDir}/cpp/tests/testlib/src"
 
 // executable paths
 def testopenpalPath = "${projectDir}/cpp/tests/openpaltests/src"
+def testopendnp3Path = "${projectDir}/cpp/tests/opendnp3tests/src"
 
 def asioPath = System.getenv("ASIO_HOME")
 
@@ -98,6 +100,22 @@ model {
             }
         }
 
+        secauthv5(NativeLibrarySpec) {
+
+            binaries.all {
+                cppCompiler.args inc(secauthv5Path), inc(openpalPath), inc(opendnp3Path)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir "${secauthv5Path}/secauthv5"
+                        include allCppFiles
+                    }
+                }
+            }
+        }
+
         testlib(NativeLibrarySpec) {
 
             binaries.all {
@@ -127,6 +145,29 @@ model {
                 cpp {
                     source {
                         srcDir testopenpalPath
+                        include allCppFiles
+                    }
+                }
+            }
+        }
+
+        testopendnp3(NativeExecutableSpec) {
+
+            binaries.all {
+                lib library: "secauthv5", linkage: 'static'
+                lib library: "asiodnp3", linkage: 'static'
+                lib library: "opendnp3", linkage: 'static'
+                lib library: "asiopal", linkage: 'static'
+                lib library: "testlib", linkage: 'static'
+                lib library: "openpal", linkage: 'static'
+                cppCompiler.args inc(openpalPath), inc(catchPath), inc(testlibPath), inc(opendnp3Path), inc(asiodnp3Path), inc(asiopalPath), inc(secauthv5Path), inc(asioPath)
+                linker.args "-lpthread"
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir testopendnp3Path
                         include allCppFiles
                     }
                 }
