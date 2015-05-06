@@ -4,11 +4,18 @@ apply plugin: 'cpp'
 // variables
 def allCppFiles = "**/*.cpp"
 
-// paths
+// library paths
 def openpalPath = "${projectDir}/cpp/libs/openpal/src"
 def opendnp3Path = "${projectDir}/cpp/libs/opendnp3/src"
 def asiopalPath = "${projectDir}/cpp/libs/asiopal/src"
 def asiodnp3Path = "${projectDir}/cpp/libs/asiodnp3/src"
+
+// test library paths
+def catchPath = "${projectDir}/cpp/tests/catch"
+def testlibPath = "${projectDir}/cpp/tests/testlib/src"
+
+// executable paths
+def testopenpalPath = "${projectDir}/cpp/tests/openpaltests/src"
 
 def asioPath = System.getenv("ASIO_HOME")
 
@@ -85,6 +92,41 @@ model {
                 cpp {
                     source {
                         srcDir "${asiodnp3Path}/asiodnp3"
+                        include allCppFiles
+                    }
+                }
+            }
+        }
+
+        testlib(NativeLibrarySpec) {
+
+            binaries.all {
+                cppCompiler.args inc(openpalPath)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir "${testlibPath}/testlib"
+                        include allCppFiles
+                    }
+                }
+            }
+
+        }
+
+        testopenpal(NativeExecutableSpec) {
+
+            binaries.all {
+                lib library: "testlib", linkage: 'static'
+                lib library: "openpal", linkage: 'static'
+                cppCompiler.args inc(openpalPath), inc(catchPath), inc(testlibPath)
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDir testopenpalPath
                         include allCppFiles
                     }
                 }
